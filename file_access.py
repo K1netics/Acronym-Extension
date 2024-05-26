@@ -7,6 +7,7 @@ from PyPDF2 import PdfReader
 import mimetypes
 import pandas as pd
 from lxml import etree
+import re
 
 def read_text_from_txt(file_path):
     with open(file_path, 'r') as file:
@@ -49,6 +50,14 @@ def read_file(file_path):
     else:
         return "Unsupported file format"
 
+def find_acronyms(text):
+    # Regular expression pattern to find acronyms (words in all caps)
+    acronym_pattern = r'\b[A-Z]{2,}\b'
+    acronyms = re.findall(acronym_pattern, text)
+    # Remove duplicates
+    unique_acronyms = list(set(acronyms))
+    return unique_acronyms
+
 def browse_and_print_text():
     try:
         file_path = filedialog.askopenfilename(
@@ -58,6 +67,13 @@ def browse_and_print_text():
             text = read_file(file_path)
             print("File contents:")
             print(text)
+            acronyms = find_acronyms(text)
+            if acronyms:
+                print("Acronyms found:")
+                for acronym in acronyms:
+                    print(acronym)
+            else:
+                print("No acronyms found in the file.")
     except FileNotFoundError:
         print(f"Error: File '{file_path}' not found.")
     except Exception as e:
